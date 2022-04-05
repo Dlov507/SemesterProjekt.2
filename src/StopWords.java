@@ -1,11 +1,19 @@
 import java.util.*;
 import java.sql.*;
 public class StopWords {
-    // factory pattern for at skifte factories
+   private static Collection<String> useableStopwords;
+    public static StopWords getInstance() {
+        return Instance;
+    }
 
-    public static Collection<String> filter(List<String> unfilteredTokens) {
 
-        Collection<String> useableStopwords = new ArrayList<>();
+    private StopWords() {
+        useableStopwords =new ArrayList<>();
+    }
+
+    private static StopWords Instance = new StopWords();
+
+    public Collection<String> filter(List<String> unfilteredTokens) {
         String jdbcURL = "jdbc:postgresql://localhost:5432/stop_words_Eng";
         String username = "postgres";
         String password = "7872667";
@@ -14,9 +22,7 @@ public class StopWords {
             Connection connection = DriverManager.getConnection(jdbcURL,username,password);
 
             for(String i: unfilteredTokens) {
-                String sql = "SELECT name FROM \"Words_to_remove\" WHERE name = '" + i + "';";
-
-
+                String sql = "SELECT name FROM \"Words_to_remove\" WHERE name = " + i + "";
 
                 Statement statement = connection.createStatement();
 
@@ -35,7 +41,7 @@ public class StopWords {
         }
         return unfilteredTokens;
     }
-    public static void addStopword(String stopword) {
+    public void addStopWord(String stopWord) {
 
         String jdbcURL = "jdbc:postgresql://localhost:5432/stop_words_Eng";
         String username = "postgres";
@@ -46,14 +52,14 @@ public class StopWords {
 
 
             String sql = "INSERT INTO \"Words_to_remove\" (name)"
-                    + "VALUES ('" + stopword + "') ON CONFLICT DO NOTHING";
+                    + "VALUES ('" + stopWord + "') ON CONFLICT DO NOTHING";
             Statement statement = connection.createStatement();
             int rows = statement.executeUpdate(sql);
             if (rows > 0){
-                System.out.println("Add command: A new stopword has been added: '" + stopword + "'");
+                System.out.println("Add command: A new stop-word has been added: " + stopWord + "");
             }
             else {
-                System.out.println("Add command: The stopword: '" + stopword +  "' already exist");
+                System.out.println("Add command: The stop-word: " + stopWord +  " already exist");
             }
 
             connection.close();
@@ -63,9 +69,7 @@ public class StopWords {
             e.printStackTrace();
         }
     }
-    public static void removeStopword(String stopword) {
-        //TreesetStopwords.remove(stopword);
-
+    public void removeStopWord(String stopWord) {
         String jdbcURL = "jdbc:postgresql://localhost:5432/stop_words_Eng";
         String username = "postgres";
         String password = "7872667";
@@ -74,15 +78,15 @@ public class StopWords {
             Connection connection = DriverManager.getConnection(jdbcURL,username,password);
 
 
-            String sql = "DELETE FROM \"Words_to_remove\" WHERE name = '" + stopword + "'";
+            String sql = "DELETE FROM \"Words_to_remove\" WHERE name = " + stopWord + "";
 
             Statement statement = connection.createStatement();
             int rows = statement.executeUpdate(sql);
             if (rows > 0){
-                System.out.println("Remove command: The stopword: '" + stopword + "' Has been removed");
+                System.out.println("Remove command: The stop-word: " + stopWord + " Has been removed");
             }
             else {
-                System.out.println("Remove command: The stopword: '" + stopword +  "' Does not exist");
+                System.out.println("Remove command: The stop-word: " + stopWord +  " Does not exist");
             }
 
             connection.close();
@@ -97,19 +101,19 @@ public class StopWords {
 
     public static void main(String[] args) {
         ArrayList<String> test = new ArrayList<>();
-        removeStopword("Ali");
+        StopWords.getInstance().removeStopWord("Ali");
         test.add("throug");
         test.add("Products");
         test.add("multiple");
         test.add("tage");
         test.add("Ali");
-        addStopword("Furthermore");
-        addStopword("Furthermore");
-        removeStopword("Furthermore");
-        removeStopword("Furthermore");
-        addStopword("Furthermore");
+        StopWords.getInstance().addStopWord("Furthermore");
+        StopWords.getInstance().addStopWord("Furthermore");
+        StopWords.getInstance().removeStopWord("Furthermore");
+        StopWords.getInstance().removeStopWord("Furthermore");
+        StopWords.getInstance().addStopWord("Furthermore");
         System.out.println("Pre filtermethod: "+test);
-        filter(test);
+        StopWords.getInstance().filter(test);
         System.out.println("Post filtermethod: "+test);
 
     }
